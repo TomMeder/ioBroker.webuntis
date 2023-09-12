@@ -427,6 +427,25 @@ class Webuntis extends utils.Adapter {
             else {
                 await this.setStateAsync(dayindex + '.' + index.toString() + '.name', null, true);
             }
+            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + '.longname', {
+                type: 'state',
+                common: {
+                    name: 'name',
+                    role: 'value',
+                    type: 'string',
+                    write: false,
+                    read: true,
+                },
+                native: {},
+            }).catch((error) => {
+                this.log.error(error);
+            });
+            if (element.su && element.su.length > 0) {
+                await this.setStateAsync(dayindex + '.' + index.toString() + '.longname', element.su[0].longname, true);
+            }
+            else {
+                await this.setStateAsync(dayindex + '.' + index.toString() + '.longname', null, true);
+            }
             await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + '.teacher', {
                 type: 'state',
                 common: {
