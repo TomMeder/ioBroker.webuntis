@@ -172,6 +172,14 @@ class Webuntis extends utils.Adapter {
                         this.log.error('Cannot read Timetable data from +1 - possible block by scool');
                         this.log.debug(error);
                     });
+                    this.log.debug('Lese Timetable +2');
+                    this.timetableDate.setDate(this.timetableDate.getDate() + 1);
+                    untis.getTimetableFor(this.timetableDate, this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
+                        await this.setTimeTable(timetable, 2);
+                    }).catch(async (error) => {
+                        this.log.error('Cannot read Timetable data from +1 - possible block by scool');
+                        this.log.debug(error);
+                    });
                 });
             }).catch(async (error) => {
                 this.log.error(error);
