@@ -143,6 +143,10 @@ class Webuntis extends utils.Adapter {
                 await this.setStateAsync('info.connection', true, true);
                 //Start the loop, we have an session
                 this.log.debug('Lese Timetable 0');
+                untis.getTimetableForWeek(new Date(), this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
+                    this.log.debug('Timetable week');
+                    this.log.debug(JSON.stringify(timetable));
+                });
                 untis.getTimetableFor(new Date(), this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
                     // Now we can start
                     //this.readDataFromWebUntis()
@@ -168,22 +172,6 @@ class Webuntis extends utils.Adapter {
                     this.timetableDate.setDate(this.timetableDate.getDate() + 1);
                     untis.getTimetableFor(this.timetableDate, this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
                         await this.setTimeTable(timetable, 1);
-                        this.log.debug('Lese Timetable +2');
-                        this.timetableDate.setDate(this.timetableDate.getDate() + 1);
-                        untis.getTimetableFor(this.timetableDate, this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
-                            await this.setTimeTable(timetable, 2);
-                            this.log.debug('Lese Timetable +3');
-                            this.timetableDate.setDate(this.timetableDate.getDate() + 1);
-                            untis.getTimetableFor(this.timetableDate, this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
-                                await this.setTimeTable(timetable, 3);
-                            }).catch(async (error) => {
-                                this.log.error('Cannot read Timetable data from +2 - possible block by school');
-                                this.log.debug(error);
-                            });
-                        }).catch(async (error) => {
-                            this.log.error('Cannot read Timetable data from +2 - possible block by school');
-                            this.log.debug(error);
-                        });
                     }).catch(async (error) => {
                         this.log.error('Cannot read Timetable data from +1 - possible block by school');
                         this.log.debug(error);
