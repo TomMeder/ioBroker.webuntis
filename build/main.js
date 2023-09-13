@@ -143,7 +143,9 @@ class Webuntis extends utils.Adapter {
                 await this.setStateAsync('info.connection', true, true);
                 //Start the loop, we have an session
                 this.log.debug('Lese Timetable 0');
-                untis.getTimetableForWeek(new Date(), this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
+                const da = new Date();
+                da.setDate(da.getDate() + 7);
+                untis.getTimetableForRange(new Date(), da, this.class_id, webuntis_1.default.TYPES.CLASS).then(async (timetable) => {
                     this.log.debug('Timetable week');
                     this.log.debug(JSON.stringify(timetable));
                 });
