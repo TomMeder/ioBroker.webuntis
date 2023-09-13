@@ -147,7 +147,7 @@ class Webuntis extends utils.Adapter {
                             this.log.info('Timetable found on next workind day')
                             await this.setTimeTable(timetable, 0);
                         }).catch(async error => {
-                            this.log.error('Cannot read Timetable data from 0 - possible block by scool');
+                            this.log.error('Cannot read Timetable data from 0 - possible block by school');
                             this.log.debug(error);
                         });
                     }
@@ -156,10 +156,31 @@ class Webuntis extends utils.Adapter {
                     this.timetableDate.setDate(this.timetableDate.getDate() + 1);
                     untis.getTimetableFor(this.timetableDate, this.class_id, APIWebUntis.TYPES.CLASS).then(async (timetable) => {
                         await this.setTimeTable(timetable, 1);
+                        this.log.debug('Lese Timetable +2');
+                        this.timetableDate.setDate(this.timetableDate.getDate() + 1);
+                        untis.getTimetableFor(this.timetableDate, this.class_id, APIWebUntis.TYPES.CLASS).then(async (timetable) => {
+                            await this.setTimeTable(timetable, 2);
+                            this.log.debug('Lese Timetable +3');
+                            this.timetableDate.setDate(this.timetableDate.getDate() + 1);
+                            untis.getTimetableFor(this.timetableDate, this.class_id, APIWebUntis.TYPES.CLASS).then(async (timetable) => {
+                                await this.setTimeTable(timetable, 3);
+                            }).catch(async error => {
+                                this.log.error('Cannot read Timetable data from +2 - possible block by school');
+                                this.log.debug(error);
+                            });
+
+
+
+                        }).catch(async error => {
+                            this.log.error('Cannot read Timetable data from +2 - possible block by school');
+                            this.log.debug(error);
+                        });
                     }).catch(async error => {
-                        this.log.error('Cannot read Timetable data from +1 - possible block by scool');
+                        this.log.error('Cannot read Timetable data from +1 - possible block by school');
                         this.log.debug(error);
                     });
+
+                    
                 })
             }).catch(async error => {
                 this.log.error(error);
@@ -192,7 +213,7 @@ class Webuntis extends utils.Adapter {
                             this.log.info('Timetable found on next workind day');
                             await this.setTimeTable(timetable, 0);
                         }).catch(async error => {
-                            this.log.error('Cannot read Timetable data from 0 - possible block by scool');
+                            this.log.error('Cannot read Timetable data from 0 - possible block by school');
                             this.log.debug(error);
                         });
                     }
@@ -202,11 +223,11 @@ class Webuntis extends utils.Adapter {
                     untis.getOwnTimetableFor(this.timetableDate).then(async (timetable) => {
                         await this.setTimeTable(timetable, 1);
                     }).catch(async error => {
-                        this.log.error('Cannot read Timetable data from +1 - possible block by scool');
+                        this.log.error('Cannot read Timetable data from +1 - possible block by school');
                         this.log.debug(error);
                     });
                 }).catch(async error => {
-                    this.log.error('Cannot read Timetable for today - possible block by scool');
+                    this.log.error('Cannot read Timetable for today - possible block by school');
                     this.log.debug(error);
                 });
 
@@ -217,7 +238,7 @@ class Webuntis extends utils.Adapter {
                     this.log.debug(JSON.stringify(newsFeed));
                     this.setNewsFeed(newsFeed);
                 }).catch(async error => {
-                    this.log.info('Cannot read Message Center - possible block by scool');
+                    this.log.info('Cannot read Message Center - possible block by school');
                     this.log.debug(error);
                 });
 
@@ -226,7 +247,7 @@ class Webuntis extends utils.Adapter {
                     this.log.debug(JSON.stringify(messages));
                     this.setInbox(messages);
                 }).catch(async error => {
-                    this.log.info('Cannot read Inbox - possible block by scool');
+                    this.log.info('Cannot read Inbox - possible block by school');
                     this.log.debug(error);
                 });
 
