@@ -150,13 +150,15 @@ class Webuntis extends utils.Adapter {
                     this.log.debug('Timetable week');
                     this.log.debug(JSON.stringify(timetable));
                     let indexTimetable = 0;
-                    (0, rxjs_1.of)(timetable).pipe((0, rxjs_1.concatMap)(res => res), (0, rxjs_1.groupBy)(item => item.date), (0, rxjs_1.mergeMap)(group => (0, rxjs_1.zip)(group.pipe((0, rxjs_1.toArray)())))).subscribe(async (grouped) => {
-                        await this.setTimeTable(grouped[0], indexTimetable);
-                        indexTimetable++;
-                        //console.log(grouped[0])
+                    (0, rxjs_1.of)(timetable).pipe((0, rxjs_1.map)((data) => { data.sort((a, b) => { return a.date < b.date ? -1 : 1; }); return data; }), (0, rxjs_1.concatMap)(res => res), (0, rxjs_1.groupBy)(item => item.date), (0, rxjs_1.mergeMap)(group => (0, rxjs_1.zip)(group.pipe((0, rxjs_1.toArray)())))).subscribe(async (grouped) => {
+                        if (grouped[0].length > 0) {
+                            this.timetableDate = this.getDateFromTimetable(grouped[0][0].date);
+                            await this.setTimeTable(grouped[0], indexTimetable);
+                            indexTimetable++;
+                        }
                     });
                 });
-                /*
+                /***
                                 untis.getTimetableFor(new Date(), this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {
                                     // Now we can start
                                     //this.readDataFromWebUntis()
@@ -606,6 +608,10 @@ class Webuntis extends utils.Adapter {
         const day = d.getDay() || 7;
         d.setDate(d.getDate() + (day > 4 ? 8 - day : 1));
         return d;
+    }
+    getDateFromTimetable(datum) {
+        const datumString = datum.toString();
+        return new Date(Number(datumString.substring(0, 4)), Number(datumString.substring(5, 7)) - 1, Number(datumString.substring(8, 10)));
     }
     //thanks to klein0r
     getMillisecondsToNextFullHour() {

@@ -5,7 +5,7 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
-import { concatMap, groupBy, mergeMap, of, toArray, zip } from 'rxjs';
+import { concatMap, groupBy, map, mergeMap, of, toArray, zip } from 'rxjs';
 import APIWebUntis, { Inbox, Lesson, NewsWidget } from 'webuntis';
 
 // Load your modules here, e.g.:
@@ -141,21 +141,23 @@ class Webuntis extends utils.Adapter {
                     this.log.debug(JSON.stringify(timetable));
                     let indexTimetable = 0;
                     of(timetable).pipe(
+                        map((data) => { data.sort((a,b) => { return a.date < b.date ? -1 : 1;}); return data}),
                         concatMap(res => res),
                         groupBy(item => item.date),
                         mergeMap(group => zip(
-                          group.pipe(toArray())
+                            group.pipe(toArray())
                         ))
-                        ).subscribe(async (grouped) => {
-                             await this.setTimeTable(grouped[0],indexTimetable );
+                    ).subscribe(async (grouped) => {
+                        if(grouped[0].length > 0) {
+                            this.timetableDate = this.getDateFromTimetable(grouped[0][0].date);
+                            await this.setTimeTable(grouped[0],indexTimetable );
                             indexTimetable++;
-
-                          //console.log(grouped[0])
-                        });
+                        }
+                    });
 
 
                 })
-/*
+/***
                 untis.getTimetableFor(new Date(), this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {
                     // Now we can start
                     //this.readDataFromWebUntis()
@@ -638,6 +640,12 @@ class Webuntis extends utils.Adapter {
         const day = d.getDay() || 7;
         d.setDate(d.getDate() + (day > 4? 8 - day : 1));
         return d;
+    }
+
+    private getDateFromTimetable(datum: number) :  Date {
+        const datumString = datum.toString();
+        return new Date(Number(datumString.substring(0,4)), Number(datumString.substring(5,7))-1, Number(datumString.substring(8,10)));
+
     }
 
     //thanks to klein0r
