@@ -28,7 +28,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = __importStar(require("@iobroker/adapter-core"));
-const rxjs_1 = require("rxjs");
+const rxjs_1 = __importDefault(require("rxjs"));
 const webuntis_1 = __importDefault(require("webuntis"));
 // Load your modules here, e.g.:
 // import * as fs from "fs";
