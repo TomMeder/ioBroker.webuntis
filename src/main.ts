@@ -5,6 +5,7 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
+import { concatMap, groupBy, mergeMap, of, toArray, zip } from 'rxjs';
 import APIWebUntis, { Inbox, Lesson, NewsWidget } from 'webuntis';
 
 // Load your modules here, e.g.:
@@ -138,8 +139,23 @@ class Webuntis extends utils.Adapter {
                 untis.getTimetableForRange(new Date(), da, this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {
                     this.log.debug('Timetable week');
                     this.log.debug(JSON.stringify(timetable));
-                })
+                    let indexTimetable = 0;
+                    of(timetable).pipe(
+                        concatMap(res => res),
+                        groupBy(item => item.date),
+                        mergeMap(group => zip(
+                          group.pipe(toArray())
+                        ))
+                        ).subscribe((grouped) => {
+                            this.setTimeTable(grouped[0],indexTimetable );
+                            indexTimetable++;
 
+                          //console.log(grouped[0])
+                        });
+
+
+                })
+/*
                 untis.getTimetableFor(new Date(), this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {
                     // Now we can start
                     //this.readDataFromWebUntis()
@@ -169,10 +185,9 @@ class Webuntis extends utils.Adapter {
                     }).catch(async error => {
                         this.log.error('Cannot read Timetable data from +1 - possible block by school');
                         this.log.debug(error);
-                    });
-
-                    
+                    });                   
                 })
+                */
             }).catch(async error => {
                 this.log.error(error);
                 this.log.error('Login Anonymous WebUntis failed');
