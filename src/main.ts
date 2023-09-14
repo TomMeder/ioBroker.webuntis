@@ -146,8 +146,8 @@ class Webuntis extends utils.Adapter {
                         mergeMap(group => zip(
                           group.pipe(toArray())
                         ))
-                        ).subscribe((grouped) => {
-                            this.setTimeTable(grouped[0],indexTimetable );
+                        ).subscribe(async (grouped) => {
+                             await this.setTimeTable(grouped[0],indexTimetable );
                             indexTimetable++;
 
                           //console.log(grouped[0])
