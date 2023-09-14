@@ -611,6 +611,9 @@ class Webuntis extends utils.Adapter {
     }
     getDateFromTimetable(datum) {
         const datumString = datum.toString();
+        this.log.debug('jahr:  ' + Number(datumString.substring(0, 4)));
+        this.log.debug('monat:  ' + (Number(datumString.substring(5, 7)) - 1));
+        this.log.debug('tag:  ' + Number(datumString.substring(8, 10)));
         return new Date(Number(datumString.substring(0, 4)), Number(datumString.substring(5, 7)) - 1, Number(datumString.substring(8, 10)));
     }
     //thanks to klein0r
