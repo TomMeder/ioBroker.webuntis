@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "webuntis",
-        "version": "0.3.4",
+        "version": "0.3.5",
         "news": {
+            "0.3.5": {
+                "en": "news",
+                "de": "neues",
+                "ru": "новое",
+                "pt": "novidades",
+                "nl": "nieuws",
+                "fr": "nouvelles",
+                "it": "notizie",
+                "es": "noticias",
+                "pl": "nowości",
+                "zh-cn": "新"
+            },
             "0.3.4": {
                 "en": "change log-level for error messages",
                 "de": "Log-Level für Fehlermeldungen ändern",
