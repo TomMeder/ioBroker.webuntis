@@ -140,25 +140,29 @@ class Webuntis extends utils.Adapter {
                     this.log.debug('Timetable week');
                     this.log.debug(JSON.stringify(timetable));
                     let indexTimetable = 0;
-                    of(timetable).pipe(
-                        map((data) => { data.sort((a,b) => { return a.date < b.date ? -1 : 1;}); return data}),
-                        concatMap(res => res),
-                        groupBy(item => item.date),
-                        mergeMap(group => zip(
-                            group.pipe(toArray())
-                        ))
-                    ).subscribe(async (grouped) => {
-                        if(grouped[0].length > 0) {
-                            this.timetableDate = this.getDateFromTimetable(grouped[0][0].date);
-                            this.log.debug('Start Timetable: '+indexTimetable);
-                            await this.setTimeTable(grouped[0],indexTimetable );
-                            indexTimetable++;
-                            this.log.debug('End Timetable: '+indexTimetable);
-                            
-                        }
+                    const reGroup = (list: any[], key: any) => {
+                        const groups: any[] = [];
+                        list.forEach(item => {
+                            let groupIndex = groups.findIndex((gi) => gi.key === item[key]);
+                            if (groupIndex === -1) {
+                                // when the group containing object does not exist in the array, 
+                                // create it
+                                groups.push({key: item[key], items: []});
+                                groupIndex = groups.length - 1;
+                            }
+                            const newItem = Object.assign({}, item);
+                            groups[groupIndex].items.push(newItem);
+                        });
+                        return groups;
+                    };
+                    const groupednew = reGroup(timetable, 'date');
+                    groupednew.forEach(async value => {
+                        this.timetableDate = this.getDateFromTimetable(value.key);
+                        this.log.debug('Start Timetable: '+indexTimetable);
+                        await this.setTimeTable(value.items,indexTimetable );
+                        indexTimetable++;
+                        this.log.debug('End Timetable: '+indexTimetable);
                     });
-
-
                 })
 /***
                 untis.getTimetableFor(new Date(), this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {

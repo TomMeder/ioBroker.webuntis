@@ -28,7 +28,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = __importStar(require("@iobroker/adapter-core"));
-const rxjs_1 = require("rxjs");
 const webuntis_1 = __importDefault(require("webuntis"));
 // Load your modules here, e.g.:
 // import * as fs from "fs";
@@ -150,14 +149,28 @@ class Webuntis extends utils.Adapter {
                     this.log.debug('Timetable week');
                     this.log.debug(JSON.stringify(timetable));
                     let indexTimetable = 0;
-                    (0, rxjs_1.of)(timetable).pipe((0, rxjs_1.map)((data) => { data.sort((a, b) => { return a.date < b.date ? -1 : 1; }); return data; }), (0, rxjs_1.concatMap)(res => res), (0, rxjs_1.groupBy)(item => item.date), (0, rxjs_1.mergeMap)(group => (0, rxjs_1.zip)(group.pipe((0, rxjs_1.toArray)())))).subscribe(async (grouped) => {
-                        if (grouped[0].length > 0) {
-                            this.timetableDate = this.getDateFromTimetable(grouped[0][0].date);
-                            this.log.debug('Start Timetable: ' + indexTimetable);
-                            await this.setTimeTable(grouped[0], indexTimetable);
-                            indexTimetable++;
-                            this.log.debug('End Timetable: ' + indexTimetable);
-                        }
+                    const reGroup = (list, key) => {
+                        const groups = [];
+                        list.forEach(item => {
+                            let groupIndex = groups.findIndex((gi) => gi.key === item[key]);
+                            if (groupIndex === -1) {
+                                // when the group containing object does not exist in the array, 
+                                // create it
+                                groups.push({ key: item[key], items: [] });
+                                groupIndex = groups.length - 1;
+                            }
+                            const newItem = Object.assign({}, item);
+                            groups[groupIndex].items.push(newItem);
+                        });
+                        return groups;
+                    };
+                    const groupednew = reGroup(timetable, 'date');
+                    groupednew.forEach(async (value) => {
+                        this.timetableDate = this.getDateFromTimetable(value.key);
+                        this.log.debug('Start Timetable: ' + indexTimetable);
+                        await this.setTimeTable(value.items, indexTimetable);
+                        indexTimetable++;
+                        this.log.debug('End Timetable: ' + indexTimetable);
                     });
                 });
                 /***
