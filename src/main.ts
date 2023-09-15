@@ -63,7 +63,10 @@ class Webuntis extends utils.Adapter {
 
                         if(this.class_id > 0) {
                             // Now we can start
-                            this.readDataFromWebUntis()
+                            this.deleteOldTimetableObjectCompleteDays(0).then(() => {
+                                this.readDataFromWebUntis();
+                            });
+                            
                         } else {
                             this.log.error('Class not found');
                         }
@@ -86,7 +89,9 @@ class Webuntis extends utils.Adapter {
                     untis.login().then(async () => {
                         this.log.debug('WebUntis Login erfolgreich')
                         // Now we can start
-                        this.readDataFromWebUntis()
+                        this.deleteOldTimetableObjectCompleteDays(0).then(() => {
+                            this.readDataFromWebUntis();
+                        });
                     }).catch(async error => {
                         this.log.error(error);
                         this.log.error('Login WebUntis failed');
