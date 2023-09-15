@@ -381,6 +381,7 @@ class Webuntis extends utils.Adapter {
 
     //Function for Timetable
     async setTimeTable(timetable: Lesson[], dayindex: number): Promise<void> {
+        this.log.debug('setTimeTable index: '+dayindex);
         //Info from this date is the timetable
         await this.setObjectNotExistsAsync(dayindex + '.timetable-date', {
             type: 'state',
@@ -644,12 +645,13 @@ class Webuntis extends utils.Adapter {
 
     private getDateFromTimetable(datum: number) :  Date {
         const datumString = datum.toString();
+        this.log.debug('ganzerstring:  '  + datumString);
         this.log.debug('jahr:  '  + Number(datumString.substring(0,4)));
         this.log.debug('monat:  '  + (Number(datumString.substring(5,6))-1));
         this.log.debug('tag:  '  + Number(datumString.substring(7,8)));
 
 
-        return new Date(Number(datumString.substring(0,4)), Number(datumString.substring(5,7))-1, Number(datumString.substring(8,10)));
+        return new Date(Number(datumString.substring(0,4)), Number(datumString.substring(5,6))-1, Number(datumString.substring(7,8)));
 
     }
 
