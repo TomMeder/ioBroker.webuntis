@@ -165,7 +165,7 @@ class Webuntis extends utils.Adapter {
                         list.forEach(item => {
                             let groupIndex = groups.findIndex((gi) => gi.key === item[key]);
                             if (groupIndex === -1) {
-                                // when the group containing object does not exist in the array, 
+                                // when the group containing object does not exist in the array,
                                 // create it
                                 groups.push({ key: item[key], items: [] });
                                 groupIndex = groups.length - 1;
@@ -213,7 +213,7 @@ class Webuntis extends utils.Adapter {
                         list.forEach(item => {
                             let groupIndex = groups.findIndex((gi) => gi.key === item[key]);
                             if (groupIndex === -1) {
-                                // when the group containing object does not exist in the array, 
+                                // when the group containing object does not exist in the array,
                                 // create it
                                 groups.push({ key: item[key], items: [] });
                                 groupIndex = groups.length - 1;
