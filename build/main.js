@@ -153,8 +153,9 @@ class Webuntis extends utils.Adapter {
                     (0, rxjs_1.of)(timetable).pipe((0, rxjs_1.map)((data) => { data.sort((a, b) => { return a.date < b.date ? -1 : 1; }); return data; }), (0, rxjs_1.concatMap)(res => res), (0, rxjs_1.groupBy)(item => item.date), (0, rxjs_1.mergeMap)(group => (0, rxjs_1.zip)(group.pipe((0, rxjs_1.toArray)())))).subscribe(async (grouped) => {
                         if (grouped[0].length > 0) {
                             this.timetableDate = this.getDateFromTimetable(grouped[0][0].date);
-                            await this.setTimeTable(grouped[0], indexTimetable);
-                            indexTimetable++;
+                            this.log.debug('Start Timetable: ' + indexTimetable);
+                            await this.setTimeTable(grouped[0], indexTimetable).then(async () => { indexTimetable++; });
+                            this.log.debug('End Timetable: ' + indexTimetable);
                         }
                     });
                 });

@@ -150,8 +150,10 @@ class Webuntis extends utils.Adapter {
                     ).subscribe(async (grouped) => {
                         if(grouped[0].length > 0) {
                             this.timetableDate = this.getDateFromTimetable(grouped[0][0].date);
-                            await this.setTimeTable(grouped[0],indexTimetable );
-                            indexTimetable++;
+                            this.log.debug('Start Timetable: '+indexTimetable);
+                            await this.setTimeTable(grouped[0],indexTimetable ).then(async () => {indexTimetable++;});
+                            this.log.debug('End Timetable: '+indexTimetable);
+                            
                         }
                     });
 
