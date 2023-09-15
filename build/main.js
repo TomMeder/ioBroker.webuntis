@@ -614,9 +614,9 @@ class Webuntis extends utils.Adapter {
         const datumString = datum.toString();
         this.log.debug('ganzerstring:  ' + datumString);
         this.log.debug('jahr:  ' + Number(datumString.substring(0, 4)));
-        this.log.debug('monat:  ' + (Number(datumString.substring(5, 6)) - 1));
-        this.log.debug('tag:  ' + Number(datumString.substring(7, 8)));
-        return new Date(Number(datumString.substring(0, 4)), Number(datumString.substring(5, 6)) - 1, Number(datumString.substring(7, 8)));
+        this.log.debug('monat:  ' + (Number(datumString.substring(4, 6)) - 1));
+        this.log.debug('tag:  ' + Number(datumString.substring(6, 8)));
+        return new Date(Number(datumString.substring(0, 4)), Number(datumString.substring(4, 6)) - 1, Number(datumString.substring(6, 8)));
     }
     //thanks to klein0r
     getMillisecondsToNextFullHour() {
