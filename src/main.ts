@@ -154,7 +154,9 @@ class Webuntis extends utils.Adapter {
                         });
                         return groups;
                     };
-                    const groupednew = reGroup(timetable, 'date');
+                    let groupednew = reGroup(timetable, 'date');
+                    groupednew = groupednew.sort((a,b) => { return a.date < b.date ? -1 : 1;});
+
                     groupednew.forEach(async (value,index) => {
                         //this.timetableDate = this.getDateFromTimetable(value.key);
                         this.log.debug('Start Timetable: '+index);
