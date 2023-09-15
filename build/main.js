@@ -405,9 +405,9 @@ class Webuntis extends utils.Adapter {
         for (const element of timetable) {
             this.log.debug('Element found: ' + index.toString());
             this.log.debug(JSON.stringify(element));
-            this.log.debug(dayindex + '.' + index.toString() + '.startTime');
+            this.log.debug(dayindex + '.' + index.toString() + ':' + timetableDate.toString());
             //create an Object for each elemnt on the day
-            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + 'startTime', {
+            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + '.startTime', {
                 type: 'state',
                 common: {
                     name: 'startTime',
