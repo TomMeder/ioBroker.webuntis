@@ -154,7 +154,8 @@ class Webuntis extends utils.Adapter {
                         if (grouped[0].length > 0) {
                             this.timetableDate = this.getDateFromTimetable(grouped[0][0].date);
                             this.log.debug('Start Timetable: ' + indexTimetable);
-                            await this.setTimeTable(grouped[0], indexTimetable).then(async () => { indexTimetable++; });
+                            await this.setTimeTable(grouped[0], indexTimetable);
+                            indexTimetable++;
                             this.log.debug('End Timetable: ' + indexTimetable);
                         }
                     });
@@ -389,12 +390,13 @@ class Webuntis extends utils.Adapter {
         let exceptions = false;
         //sorting for time
         timetable = timetable.sort((a, b) => a.startTime - b.startTime);
-        this.log.debug(JSON.stringify(timetable));
+        this.log.debug(dayindex + ': ' + JSON.stringify(timetable));
         for (const element of timetable) {
             this.log.debug('Element found: ' + index.toString());
             this.log.debug(JSON.stringify(element));
+            this.log.debug(dayindex + '.' + index.toString() + '.startTime');
             //create an Object for each elemnt on the day
-            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + '.startTime', {
+            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + ': ' + this.timetableDate.toString, {
                 type: 'state',
                 common: {
                     name: 'startTime',
