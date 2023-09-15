@@ -174,7 +174,8 @@
         "username": "",
         "client_secret": "",
         "school": "",
-        "baseUrl": ""
+        "baseUrl": "",
+        "days": "7"
     },
     "protectedNative": [
         "client_secret"
