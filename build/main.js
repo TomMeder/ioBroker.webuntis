@@ -598,6 +598,16 @@ class Webuntis extends utils.Adapter {
             await this.deleteOldTimetableObject(dayindex, index + 1);
         }
     }
+    async deleteOldTimetableObjectCompleteDays(startdayindex) {
+        this.log.debug('Object search in deleteOldTimetableObjectCompleteDays: ');
+        const delObject = await this.getObjectAsync(startdayindex + '.0.name');
+        if (delObject) {
+            this.log.debug('Object for deleting found: ' + startdayindex.toString());
+            await this.delObjectAsync(startdayindex.toString(), { recursive: true });
+            // Have one delted, next round
+            await this.deleteOldTimetableObjectCompleteDays(startdayindex + 1);
+        }
+    }
     getNextWorkDay(date) {
         const d = new Date(+date);
         const day = d.getDay() || 7;
