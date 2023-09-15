@@ -139,7 +139,6 @@ class Webuntis extends utils.Adapter {
                 untis.getTimetableForRange(new Date(), da, this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {
                     this.log.debug('Timetable week');
                     this.log.debug(JSON.stringify(timetable));
-                    let indexTimetable = 0;
                     const reGroup = (list: any[], key: any) => {
                         const groups: any[] = [];
                         list.forEach(item => {
@@ -156,12 +155,11 @@ class Webuntis extends utils.Adapter {
                         return groups;
                     };
                     const groupednew = reGroup(timetable, 'date');
-                    groupednew.forEach(async value => {
+                    groupednew.forEach(async (value,index) => {
                         this.timetableDate = this.getDateFromTimetable(value.key);
-                        this.log.debug('Start Timetable: '+indexTimetable);
-                        await this.setTimeTable(value.items,indexTimetable );
-                        indexTimetable++;
-                        this.log.debug('End Timetable: '+indexTimetable);
+                        this.log.debug('Start Timetable: '+index);
+                        await this.setTimeTable(value.items,index );
+                        this.log.debug('End Timetable: '+index);
                     });
                 })
 /***
@@ -422,7 +420,7 @@ class Webuntis extends utils.Adapter {
             this.log.debug(dayindex + '.' + index.toString() + '.startTime');
 
             //create an Object for each elemnt on the day
-            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + ': '+this.timetableDate.toString, {
+            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + ': '+this.timetableDate.toString(), {
                 type: 'state',
                 common: {
                     name: 'startTime',
