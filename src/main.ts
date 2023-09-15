@@ -5,7 +5,6 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
-import { concatMap, groupBy, map, mergeMap, of, toArray, zip } from 'rxjs';
 import APIWebUntis, { Inbox, Lesson, NewsWidget } from 'webuntis';
 
 // Load your modules here, e.g.:
@@ -164,39 +163,6 @@ class Webuntis extends utils.Adapter {
                         this.log.debug('End Timetable: '+index);
                     });
                 })
-/***
-                untis.getTimetableFor(new Date(), this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {
-                    // Now we can start
-                    //this.readDataFromWebUntis()
-                    if(timetable.length > 0) {
-                        this.log.debug('Timetable gefunden')
-
-                        this.timetableDate = new Date(); //info timetbale is fro today
-                        await this.setTimeTable(timetable, 0);
-
-                    } else {
-                        //Not timetable found, search next workingday
-                        this.log.info('No timetable Today, search next working day');
-                        this.timetableDate = this.getNextWorkDay(new Date());
-                        await untis.getTimetableFor(this.timetableDate, this.class_id, APIWebUntis.TYPES.CLASS).then(async (timetable) => {
-                            this.log.info('Timetable found on next workind day')
-                            await this.setTimeTable(timetable, 0);
-                        }).catch(async error => {
-                            this.log.error('Cannot read Timetable data from 0 - possible block by school');
-                            this.log.debug(error);
-                        });
-                    }
-                    //Next day
-                    this.log.debug('Lese Timetable +1');
-                    this.timetableDate.setDate(this.timetableDate.getDate() + 1);
-                    untis.getTimetableFor(this.timetableDate, this.class_id, APIWebUntis.TYPES.CLASS).then(async (timetable) => {
-                        await this.setTimeTable(timetable, 1);
-                    }).catch(async error => {
-                        this.log.error('Cannot read Timetable data from +1 - possible block by school');
-                        this.log.debug(error);
-                    });                   
-                })
-                */
             }).catch(async error => {
                 this.log.error(error);
                 this.log.error('Login Anonymous WebUntis failed');
@@ -214,37 +180,39 @@ class Webuntis extends utils.Adapter {
 
                 //Start the loop, we have an session
                 this.log.debug('Lese Timetable 0');
-                untis.getOwnTimetableFor(this.timetableDate).then(async (timetable) => {
-                    if(timetable.length > 0) {
-                        this.log.debug('Timetable gefunden')
 
-                        await this.setTimeTable(timetable, 0, this.timetableDate);
+                const da = new Date();
+                da.setDate(da.getDate()+7);
 
-                    } else {
-                        //Not timetable found, search next workingday
-                        this.log.info('No timetable Today, search next working day');
-                        this.timetableDate = this.getNextWorkDay(new Date());
-                        await untis.getOwnTimetableFor(this.timetableDate).then(async (timetable) => {
-                            this.log.info('Timetable found on next workind day');
-                            await this.setTimeTable(timetable, 0, this.timetableDate);
-                        }).catch(async error => {
-                            this.log.error('Cannot read Timetable data from 0 - possible block by school');
-                            this.log.debug(error);
+
+                untis.getOwnTimetableForRange(new Date(), da, ).then( async (timetable) => {
+                    this.log.debug('Timetable week');
+                    this.log.debug(JSON.stringify(timetable));
+                    const reGroup = (list: any[], key: any) => {
+                        const groups: any[] = [];
+                        list.forEach(item => {
+                            let groupIndex = groups.findIndex((gi) => gi.key === item[key]);
+                            if (groupIndex === -1) {
+                                // when the group containing object does not exist in the array, 
+                                // create it
+                                groups.push({key: item[key], items: []});
+                                groupIndex = groups.length - 1;
+                            }
+                            const newItem = Object.assign({}, item);
+                            groups[groupIndex].items.push(newItem);
                         });
-                    }
-                    //Next day
-                    this.log.debug('Lese Timetable +1');
-                    this.timetableDate.setDate(this.timetableDate.getDate() + 1);
-                    untis.getOwnTimetableFor(this.timetableDate).then(async (timetable) => {
-                        await this.setTimeTable(timetable, 1, this.timetableDate);
-                    }).catch(async error => {
-                        this.log.error('Cannot read Timetable data from +1 - possible block by school');
-                        this.log.debug(error);
+                        return groups;
+                    };
+                    let groupednew = reGroup(timetable, 'date');
+                    groupednew = groupednew.sort((a,b) => { return a.key < b.key ? -1 : 1;});
+
+                    groupednew.forEach(async (value,index) => {
+                        //this.timetableDate = this.getDateFromTimetable(value.key);
+                        this.log.debug('Start Timetable: '+index);
+                        await this.setTimeTable(value.items,index,this.getDateFromTimetable(value.key) );
+                        this.log.debug('End Timetable: '+index);
                     });
-                }).catch(async error => {
-                    this.log.error('Cannot read Timetable for today - possible block by school');
-                    this.log.debug(error);
-                });
+                })
 
                 this.log.debug('Load Message center');
                 //get Messages from Center
