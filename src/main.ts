@@ -35,7 +35,9 @@ class Webuntis extends utils.Adapter {
             this.log.error('No baseUrl set');
         } else if (this.config.school == '') {
             this.log.error('No school set');
-        } else {
+        } else if (this.config.days == '') {
+            this.log.error('No days set');
+        }else {
             if(this.config.anonymous) {
                 if (this.config.class == '') {
                     this.log.error('No class set');
@@ -132,9 +134,11 @@ class Webuntis extends utils.Adapter {
                 this.log.debug('Lese Timetable 0');
 
                 const da = new Date();
-                da.setDate(da.getDate()+7);
-
-
+                if(!this.config.days) {
+                    da.setDate(da.getDate()+7);
+                } else {
+                    da.setDate(da.getDate()+Number(this.config.days));
+                }
                 untis.getTimetableForRange(new Date(), da, this.class_id, APIWebUntis.TYPES.CLASS).then( async (timetable) => {
                     this.log.debug('Timetable week');
                     this.log.debug(JSON.stringify(timetable));
@@ -182,7 +186,12 @@ class Webuntis extends utils.Adapter {
                 this.log.debug('Lese Timetable 0');
 
                 const da = new Date();
-                da.setDate(da.getDate()+7);
+                if(!this.config.days) {
+                    da.setDate(da.getDate()+7);
+                } else {
+                    da.setDate(da.getDate()+Number(this.config.days));
+                }
+
 
 
                 untis.getOwnTimetableForRange(new Date(), da, ).then( async (timetable) => {
