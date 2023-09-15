@@ -156,9 +156,9 @@ class Webuntis extends utils.Adapter {
                     };
                     const groupednew = reGroup(timetable, 'date');
                     groupednew.forEach(async (value,index) => {
-                        this.timetableDate = this.getDateFromTimetable(value.key);
+                        //this.timetableDate = this.getDateFromTimetable(value.key);
                         this.log.debug('Start Timetable: '+index);
-                        await this.setTimeTable(value.items,index );
+                        await this.setTimeTable(value.items,index,this.getDateFromTimetable(value.key) );
                         this.log.debug('End Timetable: '+index);
                     });
                 })
@@ -216,7 +216,7 @@ class Webuntis extends utils.Adapter {
                     if(timetable.length > 0) {
                         this.log.debug('Timetable gefunden')
 
-                        await this.setTimeTable(timetable, 0);
+                        await this.setTimeTable(timetable, 0, this.timetableDate);
 
                     } else {
                         //Not timetable found, search next workingday
@@ -224,7 +224,7 @@ class Webuntis extends utils.Adapter {
                         this.timetableDate = this.getNextWorkDay(new Date());
                         await untis.getOwnTimetableFor(this.timetableDate).then(async (timetable) => {
                             this.log.info('Timetable found on next workind day');
-                            await this.setTimeTable(timetable, 0);
+                            await this.setTimeTable(timetable, 0, this.timetableDate);
                         }).catch(async error => {
                             this.log.error('Cannot read Timetable data from 0 - possible block by school');
                             this.log.debug(error);
@@ -234,7 +234,7 @@ class Webuntis extends utils.Adapter {
                     this.log.debug('Lese Timetable +1');
                     this.timetableDate.setDate(this.timetableDate.getDate() + 1);
                     untis.getOwnTimetableFor(this.timetableDate).then(async (timetable) => {
-                        await this.setTimeTable(timetable, 1);
+                        await this.setTimeTable(timetable, 1, this.timetableDate);
                     }).catch(async error => {
                         this.log.error('Cannot read Timetable data from +1 - possible block by school');
                         this.log.debug(error);
@@ -385,7 +385,7 @@ class Webuntis extends utils.Adapter {
     }
 
     //Function for Timetable
-    async setTimeTable(timetable: Lesson[], dayindex: number): Promise<void> {
+    async setTimeTable(timetable: Lesson[], dayindex: number, timetableDate: Date): Promise<void> {
         this.log.debug('setTimeTable index: '+dayindex);
         //Info from this date is the timetable
         await this.setObjectNotExistsAsync(dayindex + '.timetable-date', {
@@ -401,7 +401,7 @@ class Webuntis extends utils.Adapter {
         }).catch((error) => {
             this.log.error(error);
         });
-        await this.setStateAsync(dayindex + '.timetable-date', this.timetableDate.toString(), true);
+        await this.setStateAsync(dayindex + '.timetable-date', timetableDate.toString(), true);
 
 
         let index = 0;
@@ -420,7 +420,7 @@ class Webuntis extends utils.Adapter {
             this.log.debug(dayindex + '.' + index.toString() + '.startTime');
 
             //create an Object for each elemnt on the day
-            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + ': '+this.timetableDate.toString(), {
+            await this.setObjectNotExistsAsync(dayindex + '.' + index.toString() + 'startTime', {
                 type: 'state',
                 common: {
                     name: 'startTime',
@@ -433,7 +433,7 @@ class Webuntis extends utils.Adapter {
             }).catch((error) => {
                 this.log.error(error);
             });
-            await this.setStateAsync(dayindex + '.' + index.toString() + '.startTime', APIWebUntis.convertUntisTime(element.startTime, this.timetableDate).toString(), true);
+            await this.setStateAsync(dayindex + '.' + index.toString() + '.startTime', APIWebUntis.convertUntisTime(element.startTime, timetableDate).toString(), true);
             //save mintime
             if (minTime > element.startTime) minTime = element.startTime;
 
@@ -450,7 +450,7 @@ class Webuntis extends utils.Adapter {
             }).catch((error) => {
                 this.log.error(error);
             });
-            await  this.setStateAsync(dayindex + '.' + index.toString() + '.endTime', APIWebUntis.convertUntisTime(element.endTime, this.timetableDate).toString(), true);
+            await  this.setStateAsync(dayindex + '.' + index.toString() + '.endTime', APIWebUntis.convertUntisTime(element.endTime, timetableDate).toString(), true);
             //save maxtime
             if (maxTime < element.endTime) maxTime = element.endTime;
 
@@ -569,7 +569,7 @@ class Webuntis extends utils.Adapter {
             }).catch((error) => {
                 this.log.error(error);
             });
-            await this.setStateAsync(dayindex + '.minTime', APIWebUntis.convertUntisTime(minTime, this.timetableDate).toString(), true);
+            await this.setStateAsync(dayindex + '.minTime', APIWebUntis.convertUntisTime(minTime, timetableDate).toString(), true);
 
             await this.setObjectNotExistsAsync(dayindex + '.maxTime', {
                 type: 'state',
@@ -584,7 +584,7 @@ class Webuntis extends utils.Adapter {
             }).catch((error) => {
                 this.log.error(error);
             });
-            await this.setStateAsync(dayindex + '.maxTime', APIWebUntis.convertUntisTime(maxTime, this.timetableDate).toString(), true);
+            await this.setStateAsync(dayindex + '.maxTime', APIWebUntis.convertUntisTime(maxTime, timetableDate).toString(), true);
 
             await this.setObjectNotExistsAsync(dayindex + '.exceptions', {
                 type: 'state',
